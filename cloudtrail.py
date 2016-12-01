@@ -1,20 +1,19 @@
-"""
-manage-cloudtrail.py
-
-delete any cloudtrail logs more than retain_days old
-
-"""
-
 from __future__ import print_function
 
 import boto3
 import pytz
+import os
 from datetime import datetime, timedelta
 
 def lambda_handler(event, context):
 
     retainDays = 90
 
+    # See if we have a retention env. var
+    if os.environ.has_key('RETAINDAYS'):
+        if int(os.environ['RETAINDAYS']) > 0:
+            retainDays = int(os.environ['RETAINDAYS'])
+    
     cloudtrail = boto3.client('cloudtrail')
 
     cutoff = datetime.now().replace(tzinfo=pytz.utc) - timedelta(retainDays)
@@ -46,6 +45,8 @@ def process_logs(trail, cutoff):
     # iterate over oldObjects grabbing that many items at a time and send
     # the list to delete_objects
     items = 1000
+
+    print("Deleting " + str(len(oldObjects)) + " objects from " + bucket + "/" + prefix)
 
     while len(oldObjects) > 0:
         actionObjects=oldObjects[:items]
