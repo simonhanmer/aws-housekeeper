@@ -1,0 +1,10 @@
+*.pyc
+*.zip
+*.png
+*.jpg
+pip-selfcheck.json
+.aws/
+bin/
+include/
+lib/
+local/
